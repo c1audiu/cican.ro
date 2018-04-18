@@ -28,4 +28,46 @@ MessageContent="55534243123456780000000000000011062000000100000000000000000000"
 -------------------------------------
 
 root@raspberrypi:~# lsusb
-Bus 001 Device 007: ID 12d1:1f01 Huawei Technologies Co., Ltd. E353/E3131 (Mass storage mode)
+-------------------------------------
+12d1:1001 Huawei Technologies Co., Ltd. E169/E620/E800 HSDPA Modem
+...
+-------------------------------------
+
+root@raspberrypi:~# usb-devices
+-------------------------------------
+T:  Bus=01 Lev=02 Prnt=09 Port=02 Cnt=03 Dev#= 13 Spd=480 MxCh= 0
+D:  Ver= 2.00 Cls=00(>ifc ) Sub=00 Prot=00 MxPS=64 #Cfgs=  1
+P:  Vendor=12d1 ProdID=1001 Rev=01.02
+S:  Manufacturer=HUAWEI
+S:  Product=HUAWEI Mobile
+C:  #Ifs= 3 Cfg#= 1 Atr=80 MxPwr=500mA
+I:  If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=ff Driver=option
+I:  If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=option
+I:  If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=option
+-------------------------------------
+
+root@raspberrypi:~# nano /etc/wvdial.conf
+-------------------------------------
+[Dialer Defaults]
+Init1 = ATZ
+Init2 = ATE1
+Init3 = AT+CGDCONT=1,"IP","ipfix.vodafone.ro"
+Stupid Mode = 1
+MessageEndPoint = "0x01"
+Modem Type = Analog Modem
+ISDN = 0
+Phone = *99#
+Modem = /dev/ttyUSB0
+Username = ipfix.vodafone.ro
+Password = vodafone
+Baud = 460800
+Auto Reconnect = on
+-------------------------------------
+
+root@raspberrypi:~# wvdial
+
+root@raspberrypi:~# nano /etc/network/interfaces
+-------------------------------------
+auto ppp0
+iface ppp0 inet wvdial
+-------------------------------------
