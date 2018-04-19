@@ -16,3 +16,4 @@ root@raspberrypi:~# cp /usr/local/share/motioneye/extra/motioneye.systemd-unit-l
 // upgrade motioneye
 
 root@raspberrypi:~# pip install motioneye --upgrade && systemctl restart motioneye
+root@raspberrypi:~# systemctl restart motioneye
