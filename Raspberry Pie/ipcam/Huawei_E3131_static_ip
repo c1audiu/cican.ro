@@ -16,7 +16,6 @@ root@raspberrypi:~# nano /etc/usb_modeswitch.d/12d1:1f01
 # Huawei E3531s-2 - switch to modem mode instead of HiLink CDC-Ether mode
 TargetVendor=0x12d1
 TargetProduct=0x1f01
-
 # switch to 12d1:1001 (modem mode, 3 virtual serial ports)
 MessageContent="55534243123456780000000000000011062000000100000000000000000000"
 
@@ -51,23 +50,91 @@ root@raspberrypi:~# nano /etc/wvdial.conf
 [Dialer Defaults]
 Init1 = ATZ
 Init2 = ATE1
+;Init2 = AT+CFUN=1
 Init3 = AT+CGDCONT=1,"IP","ipfix.vodafone.ro"
 Stupid Mode = 1
-MessageEndPoint = "0x01"
 Modem Type = Analog Modem
 ISDN = 0
-Phone = *99#
+Phone = *99***#
 Modem = /dev/ttyUSB0
 Username = ipfix.vodafone.ro
 Password = vodafone
-Baud = 460800
+;Baud = 460800
+;Baud = 9600
+;Baud = 230400
+Baud = 115200
+New PPPD = yes
+Check Def Route = yes
 Auto Reconnect = on
 -------------------------------------
 
-root@raspberrypi:~# wvdial
+root@raspberrypi:~# nano /etc/ppp/peers/wvdial
+-------------------------------------
+noauth
+name wvdial
+usepeerdns
+defaultroute
+replacedefaultroute
+-------------------------------------
 
 root@raspberrypi:~# nano /etc/network/interfaces
 -------------------------------------
 auto ppp0
 iface ppp0 inet wvdial
+  pre-up /root/wait-dialup-hardware.sh ttyUSB0 20
+  pre-up /root/wait-dialup-hardware.sh ttyUSB1 20
+  pre-up /root/wait-dialup-hardware.sh ttyUSB2 20
+  pre-up sleep 30
+  post-up echo "3G (ppp0) is online"
+-------------------------------------
+
+root@raspberrypi:~# nano /root/wait-dialup-hardware.sh
+-------------------------------------
+#!/bin/bash
+#wait for interface to be available
+INTERFACE="/dev/$1"
+MAX_SECONDS_TIMEOUT=$2
+dsec=$((${MAX_SECONDS_TIMEOUT} * 10))
+for ((retry=0; retry < ${dsec}; retry++))
+do
+    if [ -c ${INTERFACE} ]; then
+        echo "$0: OK existing required device ${INTERFACE} (in $((retry / 10)).$((100 * (retry % 10) / 10)) seconds)"
+        logger "$0: OK existing required device ${INTERFACE} (in $((retry / 10)).$((100 * (retry % 10) / 10)) seconds)"
+        break
+    else
+        sleep 0.1
+    fi
+done
+if [ ! -c ${INTERFACE} ]; then
+    echo "$0: ERROR timeout waiting for required device ${INTERFACE}"
+    logger "$0: ERROR timeout waiting for required device ${INTERFACE}"
+    exit 1
+fi
+-------------------------------------
+
+root@raspberrypi:~# nano /root/check-wan-status.sh
+-------------------------------------
+#!/bin/sh
+#restart network interfaces if ppp0 3G connection is down
+
+PING="/bin/ping -q -c1 -W 10 -I ppp0"
+HOST=8.8.8.8
+
+${PING} ${HOST}
+if [ $? -ne 0 ]; then
+        echo "3G (ppp0) network connection is down! Attempting reconnection."
+
+        /sbin/ifdown --force ppp0
+        sleep 10
+        /sbin/ifup --force ppp0
+        sleep 10
+fi
+-------------------------------------
+
+root@raspberrypi:~# chmod +x /root/*.sh
+
+root@raspberrypi:~# nano /etc/crontab
+-------------------------------------
+...
+*/10 * * * * root /root/check-wan-status.sh
 -------------------------------------
