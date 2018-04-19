@@ -25,6 +25,7 @@ MessageContent="55534243123456780000000000000011062000000100000000000000000000"
 # switch to 12d1:1442 (debug mode with 2 virtual serial ports)
 # MessageContent="55534243000000000000000000000011060000000000000000000000000000"
 -------------------------------------
+// unplug & plug Huawei E3531s-2
 
 root@raspberrypi:~# lsusb
 -------------------------------------
