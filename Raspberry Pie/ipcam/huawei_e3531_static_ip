@@ -117,10 +117,8 @@ root@raspberrypi:~# nano /root/check-wan-status.sh
 -------------------------------------
 #!/bin/sh
 #restart network interfaces if ppp0 3G connection is down
-
 PING="/bin/ping -q -c1 -W 10 -I ppp0"
 HOST=8.8.8.8
-
 ${PING} ${HOST}
 if [ $? -ne 0 ]; then
         echo "3G (ppp0) network connection is down! Attempting reconnection."
