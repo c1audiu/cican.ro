@@ -32,7 +32,17 @@ cmake -D CMAKE_BUILD_TYPE=RELEASE \
     -D INSTALL_PYTHON_EXAMPLES=ON \
     -D OPENCV_EXTRA_MODULES_PATH=~/opencv_contrib-3.4.1/modules \
     -D BUILD_EXAMPLES=ON ..
-sed -i 's/CONF_SWAPSIZE=*/CONF_SWAPSIZE=1024/g' /etc/dphys-swapfile
+sed -i 's/CONF_SWAPSIZE=.*/CONF_SWAPSIZE=1024/g' /etc/dphys-swapfile
 /etc/init.d/dphys-swapfile stop 
 /etc/init.d/dphys-swapfile start
 make -j4
+make install
+ldconfig
+cd /usr/local/lib/python3.5/site-packages/
+mv cv2.*.so cv2.so
+cd ~/.virtualenvs/cv/lib/python3.5/site-packages/
+ln -s /usr/local/lib/python3.5/site-packages/cv2.so cv2.so
+rm -rf opencv-3.4.1 opencv_contrib-3.4.1
+sed -i 's/CONF_SWAPSIZE=.*/CONF_SWAPSIZE=100/g' /etc/dphys-swapfile
+/etc/init.d/dphys-swapfile stop 
+/etc/init.d/dphys-swapfile start
