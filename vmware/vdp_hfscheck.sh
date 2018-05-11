@@ -1,6 +1,5 @@
 #FIX "VDP: [001] The most recent checkpoint for the VDP appliance is outdated"
-
-#ssh root@vdp
+#https://www.experts-exchange.com/articles/17333/HOW-TO-Fix-the-VMware-Data-Protection-error-VDP-001-The-most-recent-checkpoint-for-the-VDP-appliance-is-outdated.html
 
 dpnctl stop
 
