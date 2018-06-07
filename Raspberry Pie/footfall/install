@@ -1,0 +1,6 @@
+//2018-03-13-raspbian-stretch-lite installed
+
+apt-get update && apt-get upgrade -y
+
+wget --no-check-certificate http://openframeworks.cc/versions/v0.9.0/of_v0.9.0_linuxarmv7l_release.tar.gz
+wget --no-check-certificate https://openframeworks.cc/versions/v0.10.0/of_v0.10.0_linuxarmv6l_release.tar.gz
