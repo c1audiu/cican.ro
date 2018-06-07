@@ -1,19 +1,18 @@
 // resolve dependencies 
-root@raspberrypi:~# apt-get install ffmpeg v4l-utils libmariadbclient18 libpq5 python-pip python-dev libssl-dev libcurl4-openssl-dev libjpeg-dev libz-dev -y
+apt-get install ffmpeg v4l-utils libmariadbclient18 libpq5 python-pip python-dev libssl-dev libcurl4-openssl-dev libjpeg-dev libz-dev -y
 
 // install motion
-root@raspberrypi:~# wget https://github.com/Motion-Project/motion/releases/download/release-4.1.1/pi_stretch_motion_4.1.1-1_armhf.deb && dpkg -i pi_stretch_motion_4.1.1-1_armhf.deb
+wget https://github.com/Motion-Project/motion/releases/download/release-4.1.1/pi_stretch_motion_4.1.1-1_armhf.deb && dpkg -i pi_stretch_motion_4.1.1-1_armhf.deb
 
-root@raspberrypi:~# modprobe bcm2835-v4l2 && echo "bcm2835-v4l2" >> /etc/modules
+modprobe bcm2835-v4l2 && echo "bcm2835-v4l2" >> /etc/modules
 
 // install motioneye
-root@raspberrypi:~# pip install motioneye
+pip install motioneye
 
-root@raspberrypi:~# mkdir -p /etc/motioneye && cp /usr/local/share/motioneye/extra/motioneye.conf.sample /etc/motioneye/motioneye.conf && mkdir -p /var/lib/motioneye
+mkdir -p /etc/motioneye && cp /usr/local/share/motioneye/extra/motioneye.conf.sample /etc/motioneye/motioneye.conf && mkdir -p /var/lib/motioneye
 
-root@raspberrypi:~# cp /usr/local/share/motioneye/extra/motioneye.systemd-unit-local /etc/systemd/system/motioneye.service && systemctl daemon-reload && systemctl enable motioneye && systemctl start motioneye
+cp /usr/local/share/motioneye/extra/motioneye.systemd-unit-local /etc/systemd/system/motioneye.service && systemctl daemon-reload && systemctl enable motioneye && systemctl start motioneye
 
 // upgrade motioneye
 
-root@raspberrypi:~# pip install motioneye --upgrade && systemctl restart motioneye
-root@raspberrypi:~# systemctl restart motioneye
+pip install motioneye --upgrade && systemctl restart motioneye
