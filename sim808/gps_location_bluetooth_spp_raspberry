@@ -1,0 +1,62 @@
+###SIM808
+
+##start bluetooth
+AT+BTPOWER=1
+>"OK"
+
+##check bluetooth status
+#0 Initial; 1 Disactivating; 2 Activating; 5 Idle; 6 Scanning; 7 Inquiry_Res_Ind; 8 stopping scanning; 9 Bonding;
+#12 Connecting; 13 Unpairing; 14 Deleting paired device; 15 Deleting all paired device; 16 Disconnecting;
+#19 Pairing confirm while passive pairing; 20 Waiting for remote confirm while passive pairing; 25 Accepting connection;
+#26 SDC Refreshing; 29 Setting host name; 30 Releasing all connection; 31 Releasing connection; 36 Activating service;
+AT+BTSTATUS?
+>"+BTSTATUS: 5"
+
+##config pin 1234 for pairing and restart bluetooth
+AT+BTPAIRCFG=1,1234
+>"OK"
+AT+BTPOWER=0
+>"OK"
+AT+BTPOWER=1
+>"OK"
+
+###Raspberry Pi
+##start the bluetooth daemon in compatibility mode +"-C";
+##add SP Profile;
+##save and reboot;
+nano /etc/systemd/system/dbus-org.bluez.service
+
+ExecStart=/usr/lib/bluetooth/bluetoothd -C
+ExecStartPost=/usr/bin/sdptool add SP
+
+reboot
+
+##install screen and waith for connection
+apt-get install screen -y 
+screen
+#press space or return
+rfcomm watch hci0
+>"Waiting for connection on channel 1"
+
+###SIM808
+##connect on SPP profile
+AT+BTCONNECT=1,4  
+>"OK"
+>"+BTCONNECT: 1,"raspberrypi",b8:27:eb:d1:89:68,"SPP""
+#check if connected
+AT+BTSTATUS?
+>"+BTSTATUS: 5"
+>"P: 1,"raspberrypi",b8:27:eb:d1:89:68"
+>"C: 1,"raspberrypi",b8:27:eb:d1:89:68,"SPP""
+>"OK"
+
+###Raspberry Pi
+>"Waiting for connection on channel 1
+Connection from 1D:9F:06:24:62:61 to /dev/rfcomm0
+Press CTRL-C for hangup"
+#dettach from screen 
+ctrl+a ctrl+d
+
+##install minicom
+apt-get install minicom -y
+minicom -D /dev/rfcomm0
