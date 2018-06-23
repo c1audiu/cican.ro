@@ -1,0 +1,79 @@
+##firmware
+AT+CGMR
+Revision:1418B04SIM808M32
+
+###GPS
+AT+CGPSPWR=1
+
+AT+CGPSINF=0
+<mode>,<longitude>,<latitude>,<altitude>,<UTC time>,<TTFF>,<num>,<speed>,<course> 
+0,4509.687600,2440.256800,463.100000,20180621185118.000,0,14,0.592640,62.660000
+
+AT+CGPSSTATUS? 
+
+AT+CGPSOUT=0
+AT+CGPSOUT=255
+
+###bluetooth
+#start bluetooth
+AT+BTPOWER=1
+
+#check status
+AT+BTSTATUS?
++BTSTATUS: 5
+
+#config pin for pairing and restart bluetooth
+AT+BTPAIRCFG=1,1234
+AT+BTPOWER=0
+AT+BTPOWER=1
+
+#scan
+AT+BTSCAN=1,20
+
+#get supported bluetooth profiles
++BTCONNECT: 1,"raspberrypi",b8:27:eb:d1:89:68,"HFG"
+AT+BTGETPROF=1
++BTGETPROF: 5,"HSP"
++BTGETPROF: 6,"HFP"
++BTGETPROF: 4,"SPP"
++BTGETPROF: 3,"A2DP"
++BTGETPROF: 8,"AVRCP(Target)"
++BTGETPROF: 7,"HFG"
+
+#connect using Serial Port Profile (enable it 1st on raspberrypi)
+AT+BTCONNECT=1,4
++BTDISCONN: "raspberrypi",b8:27:eb:d1:89:68,"SPP"
+
+#disconect bluetooth
+AT+BTDISCONN=1
+
+###raspberrypi bluetooth
+#enable bluetooth Serial Port Profile 
+nano /etc/systemd/system/dbus-org.bluez.service
+
+ExecStart=/usr/lib/bluetooth/bluetoothd -C
+ExecStartPost=/usr/bin/sdptool add SP
+
+reboot
+
+bluetoothctl
+[NEW] Controller B8:27:EB:D1:89:68 raspberrypi [default]
+[NEW] Device 1D:9F:06:24:62:61 SIM808
+
+rfcomm connect hci0 1D:9F:06:24:62:61
+
+rfcomm watch hci0
+Waiting for connection on channel 1
+Connection from 1D:9F:06:24:62:61 to /dev/rfcomm0
+Press CTRL-C for hangup
+
+##option 1
+apt-get install minicom -y
+minicom -o -s
+Serial Device      : /dev/rfcomm0
+Bps/Par/Bits       : 9600 8N1
+#save as sim808
+minicom -o sim808
+##option 2
+minicom -D /dev/rfcomm0
+##
